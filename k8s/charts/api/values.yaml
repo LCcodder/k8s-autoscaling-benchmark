@@ -1,0 +1,5 @@
+replicaCount: 5
+containerPort: 8080
+image:
+  repository: lccodder/miniurl-api
+  tag: ""
