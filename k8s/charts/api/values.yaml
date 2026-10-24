@@ -23,3 +23,7 @@ external:
   services:
     redis: 6379
     cassandra: 9042
+
+config:
+  datacenter: datacenter1
+  keyspace: miniurl

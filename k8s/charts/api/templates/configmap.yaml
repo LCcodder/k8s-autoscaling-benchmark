@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  REDIS_CONNECTION_STRING: {{ printf "redis://redis:%v/0" .Values.external.services.redis | quote }}
+  DATABASE_HOST: "cassandra"
+  DATACENTER: {{ .Values.config.datacenter | quote }}
+  KEYSPACE: {{ .Values.config.keyspace | quote }}
