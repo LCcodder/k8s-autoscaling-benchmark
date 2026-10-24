@@ -1,0 +1,30 @@
+image:
+  repository: grafana/k6
+  tag: "0.55.0"
+
+scriptsHostPath: /root/lab/k8s-autoscaling-benchmark/benchmarks
+
+imagePullSecrets: []
+
+scenario: mixed          # имя файла из benchmarks/scenarios без .js
+profile: smoke           # имя файла из benchmarks/profiles без .json
+
+# внутри кластера бьём в ClusterIP сервиса, мимо NodePort и nginx
+baseUrl: http://miniurl-api.miniurl.svc.cluster.local
+
+# доп. переменные для сценариев (например, URL_COUNT для redirect-cold)
+extraEnv: {}
+#  URL_COUNT: "5000"
+
+prometheus:
+  enabled: false
+  rwUrl: ""              # http://<HOST_IP>:9090/api/v1/write
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 256Mi
+  limits:
+    memory: 1Gi          # лимит CPU не ставим, иначе k6 сам станет узким местом
+
+ttlSecondsAfterFinished: 3600

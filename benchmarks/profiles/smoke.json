@@ -1,0 +1,2 @@
+{ "startRate": 1, "preAllocatedVUs": 10, "maxVUs": 50,
+  "stages": [ {"target": 5, "duration": "10s"}, {"target": 5, "duration": "20s"} ] }

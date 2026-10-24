@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: k6
+    scenario: {{ .Values.scenario | quote }}
+    profile: {{ .Values.profile | quote }}
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: {{ .Values.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        app: k6
+    spec:
+      restartPolicy: Never
+      volumes:
+        - name: scripts
+          hostPath:
+            path: {{ required "укажи scriptsHostPath" .Values.scriptsHostPath }}
+            type: Directory
+      containers:
+        - name: k6
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+          args:
+            - run
+            - --tag
+            - testid={{ .Release.Name }}
+            {{- if .Values.prometheus.enabled }}
+            - -o
+            - experimental-prometheus-rw
+            {{- end }}
+            - /scripts/scenarios/{{ .Values.scenario }}.js
+          env:
+            - name: BASE_URL
+              value: {{ .Values.baseUrl | quote }}
+            - name: PROFILE
+              value: {{ .Values.profile | quote }}
+            {{- range $key, $value := .Values.extraEnv }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- if .Values.prometheus.enabled }}
+            - name: K6_PROMETHEUS_RW_SERVER_URL
+              value: {{ required "укажи prometheus.rwUrl" .Values.prometheus.rwUrl | quote }}
+            - name: K6_PROMETHEUS_RW_TREND_STATS
+              value: "p(95),p(99),avg,max"
+            - name: K6_PROMETHEUS_RW_PUSH_INTERVAL
+              value: "5s"
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
