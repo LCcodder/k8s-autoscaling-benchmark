@@ -40,15 +40,18 @@ services:
       start_period: 60s
     restart: unless-stopped
 
-  cassandra-init:
-    image: cassandra:4.1
-    depends_on:
-      cassandra:
-        condition: service_healthy
-    volumes:
-      - ./cassandra/init.cql:/init.cql:ro
-    command: ["cqlsh", "cassandra", "-f", "/init.cql"]
-    restart: "no"
+    cassandra-init:
+      image: cassandra:4.1
+      depends_on:
+        cassandra:
+          condition: service_healthy
+      environment:
+        CASSANDRA_ADMIN_PASSWORD: ${CASSANDRA_ADMIN_PASSWORD}
+      volumes:
+        - ./cassandra/init.cql:/init.cql:ro
+        - ./cassandra/init.sh:/init.sh:ro
+      entrypoint: ["sh", "/init.sh"]
+      restart: "no"
 
 volumes:
   redis-data:
