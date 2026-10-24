@@ -3,3 +3,23 @@ containerPort: 8080
 image:
   repository: lccodder/miniurl-api
   tag: ""
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 128Mi
+  limits:
+    memory: 256Mi
+
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 6
+  targetCPU: 60
+  scaleDownWindow: 120
+
+external:
+  hostIP: 192.168.1.30 
+  services:
+    redis: 6379
+    cassandra: 9042

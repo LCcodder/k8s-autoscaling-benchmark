@@ -6,7 +6,9 @@ metadata:
   labels:
     app: miniurl-api
 spec:
+  {{- if not .Values.hpa.enabled }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -58,10 +60,19 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: JWT_SECRET
+            - name: JWT_EXPIRATION
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: JWT_EXPIRATION
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
           readinessProbe:
             tcpSocket:
               port: http
             periodSeconds: 5
+
           livenessProbe:
             tcpSocket:
               port: http
